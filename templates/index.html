@@ -10,7 +10,10 @@
         {% if documents %}
             <ul>
                 {% for document in documents %}
-                    <li><a href="{% url 'image_download' filename=document.original.name %}">{{ document.original.name }} - {{ document.converted.name }}</a></li>
+                    <li>
+                        <a href="{% url 'image_download' filename=document.converted.name %}">{{ document.converted.name }}</a><span>{{ document.status }}</span>
+
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}

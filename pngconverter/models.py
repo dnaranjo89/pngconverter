@@ -1,9 +1,15 @@
 import os
+import time
 from io import BytesIO
 from django.db import models
 from django import forms
 from django.core.files.base import ContentFile
 from PIL import Image as ImagePil
+from celery import Celery
+from celery.contrib.methods import task_method
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'imageconverter.settings')
+app = Celery('proj')
 
 
 class Image(models.Model):
@@ -27,8 +33,14 @@ class Image(models.Model):
                               default=WAITING
                               )
 
-    def convert_to_jpg(self):
+    @app.task(filter=task_method)
+    def convert_to_jpg(self, delay=None):
         self.status = Image.CONVERTING
+        if delay:
+            time.sleep(delay)
+            self.status = Image.DONE
+            self.save()
+            return
 
         im = ImagePil.open(self.original)
         f = BytesIO()

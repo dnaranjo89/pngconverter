@@ -17,16 +17,11 @@ def index(request):
         form = ImageForm(request.POST, request.FILES)
         if form.is_valid():
             # TODO Fetch the image
-            image = Image(original=request.FILES['image'])
-            # image = Image()
-
-            # Delay the task here
-            # time.sleep(3)
-
-            image.save()
-            # long_task.delay()
-
-            image.convert_to_jpg()
+            # image = Image(original=request.FILES['image'])
+            for _ in range(15):
+                image = Image()
+                image.save()
+                image.convert_to_jpg.delay(3)
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('index'))
@@ -34,7 +29,7 @@ def index(request):
         form = ImageForm()  # A empty, unbound form
 
     # Load documents for the list page
-    documents = Image.objects.filter(status=Image.DONE)
+    documents = Image.objects.filter()
 
     # Render list page with the documents and the form
     return render(request, 'index.html', {'documents': documents, 'form': form})
