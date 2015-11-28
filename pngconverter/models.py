@@ -21,7 +21,7 @@ class Image(models.Model):
 
     # TODO Original has to be REQUIRED
     original = models.ImageField(upload_to='imageStore/original', blank=True, null=True)
-    converted = models.ImageField(upload_to='imageStore/png', blank=True, null=True)
+    converted = models.ImageField(upload_to='imageStore/jpg', blank=True, null=True)
     status = models.CharField(max_length=20,
                               choices=STATUS_CHOICES,
                               default=WAITING
@@ -34,12 +34,12 @@ class Image(models.Model):
         f = BytesIO()
         try:
             # Convert to PNG
-            im.save(f, format='png')
+            im.save(f, format='jpeg')
         except Exception:
             # TODO Handle the exception
             self.status = Image.FAILED
         else:
-            new_filename = os.path.splitext(self.original.name)[0] + '.png'
+            new_filename = os.path.splitext(self.original.name)[0] + '.jpg'
             self.converted.save(new_filename, ContentFile(f.getvalue()))
         finally:
             f.close()
