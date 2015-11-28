@@ -19,8 +19,7 @@ from django.contrib import admin
 from pngconverter import views
 
 urlpatterns = [
-    url(r'^$', views.index),
-    url(r'^list/$', views.list, name='list'),
+    url(r'^$', views.index, name='index'),
     url(r'^download/(?P<filename>.*)$', views.image_download, name='image_download'),
     url(r'^monitor/$', views.monitor),
     url(r'^admin/', include(admin.site.urls)),

@@ -2,39 +2,24 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
-from pngconverter.models import ImageForm, DocumentForm, Document
+from pngconverter.models import DocumentForm, Document
+import time
 from django.conf import settings
-
-
-def index(request):
-    if request.method == 'POST':
-        form = ImageForm(request.POST)
-
-        # Have we been provided with a valid form?
-        if form.is_valid():
-            # Save the new category to the database.
-
-            # Now call the index() view.
-            # The user will be shown the homepage.
-            return index(request)
-        else:
-            print(form.errors)
-    else:
-        # If the request was not a POST, display the form to enter details.
-        form = ImageForm()
-
-    return render(request, 'index.html', {'form': form})
 
 
 def monitor(request):
     return render(request, 'monitor.html', {})
 
-def list(request):
+def index(request):
     # Handle file upload
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             newdoc = Document(docfile=request.FILES['docfile'])
+
+            # Delay the task here
+            time.sleep(3)
+
             newdoc.save()
 
             # Redirect to the document list after POST
