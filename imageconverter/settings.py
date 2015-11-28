@@ -105,7 +105,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-IMAGE_STORE_URL = 'imageStore/'
-IMAGE_STORE_ROOT = os.path.join(BASE_DIR, 'imageStore')  # Absolute path to the media directory
+IMAGE_STORE_ROOT = os.path.join(BASE_DIR, 'imageStore')
 
 CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'

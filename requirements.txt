@@ -1,2 +1,4 @@
+django
 pillow
-Wand
+celery
+django-celery
