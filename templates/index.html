@@ -5,10 +5,10 @@
         <meta charset="utf-8">
         <title>Image Converter</title>
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script src="{% static 'js/dropzone.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script>
             var update_status = function (images){
                 for (var i = 0; i < images.length; i++) {
@@ -29,7 +29,7 @@
                                     '   <td>' +
                                     '       <a href="' + image.url_download + '">' + image.filename + '</a>'+
                                     '   </td>'+
-                                    '   <td class="status status-' + image.status + '">' + image.status + '</td>'+
+                                    '   <td class="text-center status status-' + image.status + '">' + image.status + '</td>'+
                                     '</tr>';
                         $('#images tr:first').after(html);
                     }
@@ -38,63 +38,38 @@
             };
 
             var fetch_changes = function (){
-                    var images = {
-                        'ids': $('#images')
-                                .find('tr')
-                                .filter(function(){
-                                    var $status = $(this).find('.status');
-                                    if ($status.hasClass('status-waiting') || $status.hasClass('status-processing'))
-                                    return this;
-                                })
-                                .map(function(){ return $(this).attr('data-id'); })
-                                .get()
-
-                    };
-                    if (1) {
-                        $.ajax({
-                            method : "GET",
-                            url   : {% url 'monitor' %},
-                            contentType: 'application/json',
-                            data: images
-                        }).done(function (data){
-{#                            console.log(data);#}
-                            update_status(data)
-                        })
-                        .fail(function (e) {
-                            console.log("Couldn't load changes");
-                        });
-                    }
-                    setTimeout(fetch_changes,1000);
-                };
-
-            Dropzone.options.addPhotos = {
-              init: function() {
-                this.on("success", function(file) { console.log("succs.");});
-{#                this.on("successmultiple", function(file) { console.log("Success."); });#}
-{#                this.on("totaluploadprogress", function(file) { console.log("prog."); });#}
-              }
+                $.ajax({
+                    method : "GET",
+                    url   : {% url 'monitor' %},
+                    contentType: 'application/json',
+                }).done(function (data){
+                    update_status(data)
+                })
+                .fail(function () {
+                    console.log("Couldn't load changes");
+                });
+                setTimeout(fetch_changes,1000);
             };
-
             $(document).ready(function () {
                 fetch_changes()
             });
         </script>
     </head>
-
     <body>
+        <h1 class="text-center">PNG to JPG Converter</h1>
         {% if images %}
             <div class="col-md-6">
-                <table id="images" style="width:40%">
+                <table id="images" class="table table-hover table-striped">
                     <tr>
                         <th>Image</th>
-                        <th>Status</th>
+                        <th class="text-center">Status</th>
                     </tr>
                     {% for image in images %}
                         <tr id="image-{{ image.id }}">
                             <td>
                                 <a href="{% url 'image_download' filename=image.converted.name %}">{{ image.converted.name }}</a>
                             </td>
-                            <td class="status status-{{ image.status }}">{{ image.status }}</td>
+                            <td class="text-center status status-{{ image.status }}">{{ image.status }}</td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -115,22 +90,5 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-6 hidden">
-            <!-- Upload form. Note enctype attribute! -->
-            <form action="{% url "image_upload" %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <p>{{ form.non_field_errors }}</p>
-
-                <p>{{ form.image.label_tag }} {{ form.image.help_text }}</p>
-
-                <p>
-                    {{ form.image.errors }}
-                    {{ form.image }}
-                </p>
-
-                <p><input type="submit" value="Upload"/></p>
-            </form>
-        </div>
     </body>
-
 </html>
