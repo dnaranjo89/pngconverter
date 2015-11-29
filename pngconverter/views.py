@@ -6,6 +6,7 @@ from django.views.decorators.http import require_http_methods
 from pngconverter.models import Image
 from celery import Celery
 import mimetypes
+from random import randrange
 
 app = Celery('image_converter')
 
@@ -21,7 +22,8 @@ def image_upload(request):
     image = Image(original=request.FILES['file'])
     image.save()
     # Start the conversion
-    image.convert_to_jpg.delay(4)
+    delay = randrange(3, 6) if 'add-delay' in request.POST else 0
+    image.convert_to_jpg.delay(delay)
     return HttpResponse()
 
 

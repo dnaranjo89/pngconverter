@@ -13,3 +13,29 @@
 .status-processing {
     background-color: #9AE0FF;
 }
+
+.dz-default {
+    height: 300px;
+}
+
+.dz-preview{
+    display: none;
+}
+
+
+.dropzone {
+    margin-top: 50px;
+    margin-right: 50px;
+    border: 2px dashed #0087F7;
+    border-radius: 5px;
+    background: white;
+}
+.dropzone .dz-message {
+    font-weight: 400;
+}
+.dropzone .dz-message .note {
+    font-size: 0.8em;
+    font-weight: 200;
+    display: block;
+    margin-top: 1.4rem;
+}

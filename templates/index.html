@@ -6,6 +6,7 @@
         <title>Image Converter</title>
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="{% static 'js/dropzone.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script>
@@ -24,8 +25,7 @@
 
                         $status_cell.text(status_string);
                     }else{
-                        var html =  '<tr id="image-' + image.id + '" data-id="' + image.id + '">' +
-                                    '   <td class="id">' + image.id + '</td>' +
+                        var html =  '<tr id="image-' + image.id + '">' +
                                     '   <td>' +
                                     '       <a href="' + image.url_download + '">' + image.filename + '</a>'+
                                     '   </td>'+
@@ -86,13 +86,11 @@
             <div class="col-md-6">
                 <table id="images" style="width:40%">
                     <tr>
-                        <th>ID</th>
                         <th>Image</th>
                         <th>Status</th>
                     </tr>
                     {% for image in images %}
-                        <tr id="image-{{ image.id }}" data-id="{{ image.id }}">
-                            <td class="id">{{ image.id }}</td>
+                        <tr id="image-{{ image.id }}">
                             <td>
                                 <a href="{% url 'image_download' filename=image.converted.name %}">{{ image.converted.name }}</a>
                             </td>
@@ -107,7 +105,14 @@
         <div class="col-md-6">
             <form id="add-photos" action="{% url 'image_upload' %}"  class="dropzone">
                 {% csrf_token %}
-                <p><input type="submit" value="Upload"/></p>
+                <div class="dz-message needsclick">
+                    Drop files here or click to upload.<br>
+                </div>
+                <div class="checkbox text-center">
+                    <label>
+                      <input type="checkbox" name="add-delay"> Simulate wooden server (~4 secs extra per conversion)
+                    </label>
+                </div>
             </form>
         </div>
         <div class="col-md-6 hidden">
