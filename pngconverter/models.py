@@ -39,18 +39,16 @@ class Image(models.Model):
         self.save()
         if delay:
             time.sleep(delay)
-            self.status = Image.DONE
-            self.save()
-            return
 
         im = ImagePil.open(self.original)
         f = BytesIO()
         try:
-            # Convert to PNG
+            # Convert to JPG
             im.save(f, format='jpeg')
         except Exception:
             # TODO Handle the exception
             self.status = Image.FAILED
+            self.save()
         else:
             new_filename = os.path.splitext(self.original.name)[0] + '.jpg'
             self.converted.save(new_filename, ContentFile(f.getvalue()))

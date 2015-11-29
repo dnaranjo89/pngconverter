@@ -3,28 +3,41 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Minimal Django File Upload Example</title>
+        <title>Image Converter</title>
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="{% static 'js/dropzone.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script>
-            var update_status = function (status){
-                for (var id in status) {
-                    if (status[id] == 'CONVERTING')
-                        console.log(status[id]);
-                    var $status_cell = $('#image-' + id).find('.status');
-                    var status_string = status[id].toLowerCase();
-                    // remove old status
-                    $status_cell.removeClass (function (index, css) {
-                        return (css.match (/(^|\s)status-\S+/g) || []).join(' ');
-                    });
-                    $status_cell.addClass('status-' + status_string);
+            var update_status = function (images){
+                for (var i = 0; i < images.length; i++) {
+                    var image = images[i];
+                    var $image_row = $('#image-' + image.id);
+                    if ($image_row.length){
+                        var $status_cell = $image_row.find('.status');
+                        var status_string = image.status;
+                        // remove old status
+                        $status_cell.removeClass (function (index, css) {
+                            return (css.match (/(^|\s)status-\S+/g) || []).join(' ');
+                        });
+                        $status_cell.addClass('status-' + status_string);
 
-                    $status_cell.text(status_string);
+                        $status_cell.text(status_string);
+                    }else{
+                        var html =  '<tr id="image-' + image.id + '" data-id="' + image.id + '">' +
+                                    '   <td class="id">' + image.id + '</td>' +
+                                    '   <td>' +
+                                    '       <a href="' + image.url_download + '">' + image.filename + '</a>'+
+                                    '   </td>'+
+                                    '   <td class="status status-' + image.status + '">' + image.status + '</td>'+
+                                    '</tr>';
+                        $('#images tr:first').after(html);
+                    }
+
                 }
             };
 
-            var refresh = function (){
+            var fetch_changes = function (){
                     var images = {
                         'ids': $('#images')
                                 .find('tr')
@@ -37,24 +50,33 @@
                                 .get()
 
                     };
-                    console.log(images.ids.length);
-                    $.ajax({
-                        method : "GET",
-                        url   : {% url 'monitor' %},
-                        contentType: 'application/json',
-                        data: images
-                    }).done(function (data){
-{#                        console.log(data);#}
-                        update_status(data.status)
-                    })
-                    .fail(function (e) {
-                        console.log("Couldn't load changes");
-                    });
-                    setTimeout(refresh,1000);
+                    if (1) {
+                        $.ajax({
+                            method : "GET",
+                            url   : {% url 'monitor' %},
+                            contentType: 'application/json',
+                            data: images
+                        }).done(function (data){
+{#                            console.log(data);#}
+                            update_status(data)
+                        })
+                        .fail(function (e) {
+                            console.log("Couldn't load changes");
+                        });
+                    }
+                    setTimeout(fetch_changes,1000);
                 };
 
+            Dropzone.options.addPhotos = {
+              init: function() {
+                this.on("success", function(file) { console.log("succs.");});
+{#                this.on("successmultiple", function(file) { console.log("Success."); });#}
+{#                this.on("totaluploadprogress", function(file) { console.log("prog."); });#}
+              }
+            };
+
             $(document).ready(function () {
-                refresh()
+                fetch_changes()
             });
         </script>
     </head>
@@ -83,6 +105,12 @@
             {% endif %}
         </div>
         <div class="col-md-6">
+            <form id="add-photos" action="{% url 'index' %}"  class="dropzone">
+                {% csrf_token %}
+                <p><input type="submit" value="Upload"/></p>
+            </form>
+        </div>
+        <div class="col-md-6 hidden">
             <!-- Upload form. Note enctype attribute! -->
             <form action="{% url "index" %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
