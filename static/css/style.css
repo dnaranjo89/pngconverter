@@ -6,7 +6,7 @@
     background-color: #14EDA7;
 }
 
-.status-fail {
+.status-failed {
     background-color: #E66363;
 }
 
@@ -21,7 +21,6 @@
 .dz-preview{
     display: none;
 }
-
 
 .dropzone {
     margin-top: 50px;

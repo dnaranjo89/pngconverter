@@ -44,17 +44,14 @@ class Image(models.Model):
         try:
             # Convert to JPG
             im.save(f, format='jpeg')
-        except Exception:
+        except Exception as e:
             # TODO Handle the exception
             self.status = Image.FAILED
             self.save()
         else:
             new_filename = os.path.splitext(self.original.name)[0] + '.jpg'
             self.converted.save(new_filename, ContentFile(f.getvalue()))
+            self.status = Image.DONE
+            self.save()
         finally:
             f.close()
-
-        # Commit everything
-        self.status = Image.DONE
-        self.save()
-
