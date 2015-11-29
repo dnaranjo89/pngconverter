@@ -1,39 +1,103 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <title>Minimal Django File Upload Example</title>
+        <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <script>
+            var update_status = function (status){
+                for (var id in status) {
+                    if (status[id] == 'CONVERTING')
+                        console.log(status[id]);
+                    var $status_cell = $('#image-' + id).find('.status');
+                    var status_string = status[id].toLowerCase();
+                    // remove old status
+                    $status_cell.removeClass (function (index, css) {
+                        return (css.match (/(^|\s)status-\S+/g) || []).join(' ');
+                    });
+                    $status_cell.addClass('status-' + status_string);
+
+                    $status_cell.text(status_string);
+                }
+            };
+
+            var refresh = function (){
+                    var images = {
+                        'ids': $('#images')
+                                .find('tr')
+                                .filter(function(){
+                                    var $status = $(this).find('.status');
+                                    if ($status.hasClass('status-waiting') || $status.hasClass('status-processing'))
+                                    return this;
+                                })
+                                .map(function(){ return $(this).attr('data-id'); })
+                                .get()
+
+                    };
+                    console.log(images.ids.length);
+                    $.ajax({
+                        method : "GET",
+                        url   : {% url 'monitor' %},
+                        contentType: 'application/json',
+                        data: images
+                    }).done(function (data){
+{#                        console.log(data);#}
+                        update_status(data.status)
+                    })
+                    .fail(function (e) {
+                        console.log("Couldn't load changes");
+                    });
+                    setTimeout(refresh,1000);
+                };
+
+            $(document).ready(function () {
+                refresh()
+            });
+        </script>
     </head>
 
     <body>
-        <!-- List of uploaded documents -->
-        {% if documents %}
-            <ul>
-                {% for document in documents %}
-                    <li>
-                        <a href="{% url 'image_download' filename=document.converted.name %}">{{ document.converted.name }}</a><span>{{ document.status }}</span>
+        {% if images %}
+            <div class="col-md-6">
+                <table id="images" style="width:40%">
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Status</th>
+                    </tr>
+                    {% for image in images %}
+                        <tr id="image-{{ image.id }}" data-id="{{ image.id }}">
+                            <td class="id">{{ image.id }}</td>
+                            <td>
+                                <a href="{% url 'image_download' filename=image.converted.name %}">{{ image.converted.name }}</a>
+                            </td>
+                            <td class="status status-{{ image.status }}">{{ image.status }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No images.</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <!-- Upload form. Note enctype attribute! -->
+            <form action="{% url "index" %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <p>{{ form.non_field_errors }}</p>
 
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No documents.</p>
-        {% endif %}
+                <p>{{ form.image.label_tag }} {{ form.image.help_text }}</p>
 
-        <!-- Upload form. Note enctype attribute! -->
-        <form action="{% url "index" %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>{{ form.non_field_errors }}</p>
+                <p>
+                    {{ form.image.errors }}
+                    {{ form.image }}
+                </p>
 
-            <p>{{ form.image.label_tag }} {{ form.image.help_text }}</p>
-
-            <p>
-                {{ form.image.errors }}
-                {{ form.image }}
-            </p>
-
-            <p><input type="submit" value="Upload"/></p>
-        </form>
+                <p><input type="submit" value="Upload"/></p>
+            </form>
+        </div>
     </body>
 
 </html>

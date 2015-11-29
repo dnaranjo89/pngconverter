@@ -20,9 +20,8 @@ from pngconverter import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^monitor/$', views.monitor, name='monitor'),
     url(r'^download/(?P<filename>.*)$', views.image_download, name='image_download'),
-    url(r'^monitor/$', views.monitor),
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^imageStore/(?P<path>.*)$', 'django.views.static.serve', {
         'document_root': settings.IMAGE_STORE_ROOT,
     }),

@@ -1,0 +1,15 @@
+.status-waiting {
+    background-color: #FFE68A;
+}
+
+.status-done {
+    background-color: #14EDA7;
+}
+
+.status-fail {
+    background-color: #E66363;
+}
+
+.status-processing {
+    background-color: #9AE0FF;
+}

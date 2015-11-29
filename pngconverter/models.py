@@ -9,18 +9,18 @@ from celery import Celery
 from celery.contrib.methods import task_method
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'imageconverter.settings')
-app = Celery('proj')
+app = Celery('image_converter')
 
 
 class Image(models.Model):
-    WAITING = 'WAITING'
-    CONVERTING = 'CONVERTING'
-    DONE = 'DONE'
-    FAILED = 'FAILED'
+    WAITING = 'waiting'
+    PROCESSING = 'processing'
+    DONE = 'done'
+    FAILED = 'failed'
 
     STATUS_CHOICES = (
         (WAITING, 'Waiting'),
-        (CONVERTING, 'Converting'),
+        (PROCESSING, 'processing'),
         (DONE, 'Done'),
         (FAILED, 'Failed'),
     )
@@ -35,7 +35,8 @@ class Image(models.Model):
 
     @app.task(filter=task_method)
     def convert_to_jpg(self, delay=None):
-        self.status = Image.CONVERTING
+        self.status = Image.PROCESSING
+        self.save()
         if delay:
             time.sleep(delay)
             self.status = Image.DONE

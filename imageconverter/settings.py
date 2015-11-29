@@ -105,6 +105,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Additional locations of static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 IMAGE_STORE_ROOT = os.path.join(BASE_DIR, 'imageStore')
 
 CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
