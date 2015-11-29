@@ -43,7 +43,7 @@ class Image(models.Model):
         f = BytesIO()
         try:
             # Convert to JPG
-            im.save(f, format='jpeg')
+            im.convert('RGB').save(f, format='jpeg')
         except Exception as e:
             # TODO Handle the exception
             self.status = Image.FAILED
