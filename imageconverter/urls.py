@@ -20,6 +20,7 @@ from pngconverter import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^image_upload/$', views.image_upload, name='image_upload'),
     url(r'^monitor/$', views.monitor, name='monitor'),
     url(r'^download/(?P<filename>.*)$', views.image_download, name='image_download'),
     url(r'^imageStore/(?P<path>.*)$', 'django.views.static.serve', {

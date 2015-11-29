@@ -105,14 +105,14 @@
             {% endif %}
         </div>
         <div class="col-md-6">
-            <form id="add-photos" action="{% url 'index' %}"  class="dropzone">
+            <form id="add-photos" action="{% url 'image_upload' %}"  class="dropzone">
                 {% csrf_token %}
                 <p><input type="submit" value="Upload"/></p>
             </form>
         </div>
         <div class="col-md-6 hidden">
             <!-- Upload form. Note enctype attribute! -->
-            <form action="{% url "index" %}" method="post" enctype="multipart/form-data">
+            <form action="{% url "image_upload" %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <p>{{ form.non_field_errors }}</p>
 

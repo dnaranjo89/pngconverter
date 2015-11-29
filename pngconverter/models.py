@@ -2,7 +2,6 @@ import os
 import time
 from io import BytesIO
 from django.db import models
-from django import forms
 from django.core.files.base import ContentFile
 from PIL import Image as ImagePil
 from celery import Celery
@@ -58,11 +57,4 @@ class Image(models.Model):
         # Commit everything
         self.status = Image.DONE
         self.save()
-
-
-class ImageForm(forms.Form):
-    image = forms.ImageField(
-        label='Select a file',
-        required=False,  # TODO The image field has to be required
-    )
 

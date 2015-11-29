@@ -1,43 +1,28 @@
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
-from django.core import serializers
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, HttpRequest
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, HttpRequest,HttpResponseBadRequest
 from django.shortcuts import render
-from django.conf import settings
-from pngconverter.models import Image, ImageForm
+from django.views.decorators.http import require_http_methods
+from pngconverter.models import Image
 from celery import Celery
 import mimetypes
 
 app = Celery('image_converter')
 
 
-def fake_upload():
-    for _ in range(10):
-        image = Image()
-        image.save()
-        image.convert_to_jpg.delay(3)
-
 def index(request):
-    # Handle file upload
-    if request.method == 'POST':
-        form = ImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            # TODO Fetch the image
-            # fake_upload()
-            image = Image(original=request.FILES['file'])
-            image.save()
-            image.convert_to_jpg.delay(4)
-
-            # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('index'))
-    else:
-        form = ImageForm()  # A empty, unbound form
-
-    # Load documents for the list page
     images = reversed(Image.objects.all())
+    return render(request, 'index.html', {'images': images})
 
-    # Render list page with the documents and the form
-    return render(request, 'index.html', {'images': images, 'form': form})
+
+@require_http_methods(["POST"])
+def image_upload(request):
+    # Save the image
+    image = Image(original=request.FILES['file'])
+    image.save()
+    # Start the conversion
+    image.convert_to_jpg.delay(4)
+    return HttpResponse()
 
 
 def image_download(request, filename):
@@ -49,6 +34,11 @@ def image_download(request, filename):
 
 
 def monitor(request):
+    """
+     This method should only return the files uploaded for the current user
+     or within a particular session... Of course not the whole DB, its just
+     for testing purposes.
+    """
     images = Image.objects.all()
     response = []
     for image in images:
