@@ -1,5 +1,5 @@
-=============
 PNG to JPG converter
+=============
 
 ## Requirements
 * Celery

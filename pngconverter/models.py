@@ -32,6 +32,9 @@ class Image(models.Model):
                               default=WAITING
                               )
 
+    class Meta:
+        app_label = 'pngconverter'
+
     @app.task(filter=task_method)
     def convert_to_jpg(self, delay=None):
         self.status = Image.PROCESSING
@@ -55,3 +58,4 @@ class Image(models.Model):
             self.save()
         finally:
             f.close()
+            im.close()
