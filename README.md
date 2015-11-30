@@ -3,7 +3,9 @@ PNG to JPG converter
 
 ## Features
 * Queue system
-* Error checking and detailed feedback
+* Multiple image upload
+* Image preview
+* Error checking and detailed feedback (over the image preview)
 * Download the converted images (from the links in the left)
 * Real time status without reloading the page
 * Uploading progress bar
