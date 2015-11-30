@@ -1,6 +1,16 @@
 PNG to JPG converter
 =============
 
+## Features
+* Queue system
+* Error checking and detailed feedback
+* Download the converted images (from the links in the left)
+* Real time status without reloading the page
+* Uploading progress bar
+* Wooden server simulator (adds delay to processes, for testing purposes)
+* Automatic queue restarting in case the server is shutdown
+* Others that I may be forgetting... :O
+
 ## Requirements
 * Celery
 * RabbitMQ
