@@ -50,12 +50,12 @@ class Image(models.Model):
         except Exception as e:
             # TODO Handle the exception
             self.status = Image.FAILED
-            self.save()
+            raise Exception("Impossible to convert to JPG")
         else:
             new_filename = os.path.splitext(self.original.name)[0] + '.jpg'
             self.converted.save(new_filename, ContentFile(f.getvalue()))
             self.status = Image.DONE
-            self.save()
         finally:
+            self.save()
             f.close()
             im.close()

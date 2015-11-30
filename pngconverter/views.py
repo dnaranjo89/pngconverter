@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from pngconverter.models import Image
 from celery import Celery
+from PIL import Image as ImagePil
 import mimetypes
 from random import randrange
 
@@ -18,12 +19,23 @@ def index(request):
 
 @require_http_methods(["POST"])
 def image_upload(request):
+    # Validate image
+    try:
+        im = ImagePil.open(request.FILES['file'])
+    except Exception:
+        return HttpResponseBadRequest("Are you sure that's an image? :/")
+    if im.format is not 'PNG':
+        return HttpResponseBadRequest("That's not a PNG!")
+
     # Save the image
     image = Image(original=request.FILES['file'])
     image.save()
     # Start the conversion
     delay = randrange(3, 6) if 'add-delay' in request.POST else 0
-    image.convert_to_jpg.delay(delay)
+    try:
+        image.convert_to_jpg.delay(delay)
+    except Exception as e:
+        return HttpResponseBadRequest(e)
     return HttpResponse()
 
 
